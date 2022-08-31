@@ -1,0 +1,67 @@
+#! /usr/bin/env bash
+
+# © 2022 Unvanquished Developers
+# MIT License https://spdx.org/licenses/MIT.html
+
+export shell_opts="${shell_opts:--u -e -o pipefail}"
+set ${shell_opts}
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+cd "${script_dir}"
+
+if [ "$(whoami)" = 'root' ]
+then
+	printf 'ERROR: must run as user\n' >&2
+	exit 1
+fi
+
+cat > 'irc-atom-notice.service' <<-EOF
+[Unit]
+Description=IRC Atom notice
+After=network-online.target nginx.service mariadb.service php7.4.service overmind.service
+
+[Service]
+Type=simple
+
+User=$(whoami)
+Group=$(whoami)
+UMask=007
+
+ExecStart=${PWD}/irc-atom-notice-service
+
+Restart=on-failure
+
+# Configures the time to wait before service is stopped forcefully.
+TimeoutStopSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+cat > 'irc-atom-notice.sudoers' <<-EOF
+$(whoami)	ALL=(overmind)	NOPASSWD:	$(ls -d ~overmind)/msg
+EOF
+
+cat > 'Makefile' <<\EOF
+.DEFAULT_GOAL := build
+
+.PHONY: build clean install uninstall
+
+build:
+	true
+
+clean:
+	rm -v irc-atom-notice.sudoers
+	rm -v irc-atom-notice.service
+	rm -v Makefile
+
+install:
+	install -T -m 440 irc-atom-notice.sudoers /etc/sudoers.d/irc-atom-notice
+	install irc-atom-notice.service /etc/systemd/system/
+	systemctl enable irc-atom-notice.service
+
+uninstall:
+	systemctl disable irc-atom-notice.service
+	rm -v /etc/systemd/system/irc-atom-notice.service
+	rm -v /etc/sudoers.d/irc-atom-notice
+EOF
