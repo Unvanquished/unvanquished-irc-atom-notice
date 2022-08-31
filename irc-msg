@@ -5,4 +5,7 @@
 export shell_opts="${shell_opts:--u -e -o pipefail}"
 set ${shell_opts}
 
-sudo -u overmind ~overmind/msg "${@}"
+channel="${1}"; shift
+message="${1}"; shift
+
+sudo -u overmind ~overmind/msg "${channel}" "${message}"
