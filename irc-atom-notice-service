@@ -1,0 +1,31 @@
+#! /usr/bin/env bash
+
+# © 2022 Unvanquished Developers
+# MIT License https://spdx.org/licenses/MIT.html 
+
+export shell_opts="${shell_opts:--u -e -o pipefail}"
+set ${shell_opts}
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+cd "${script_dir}"
+
+script_name="$(basename "${BASH_SOURCE[0]}")"
+
+. 'irc-atom-notice.conf'
+
+case "${1:-}" in
+	'-h'|'--help')
+		printf '%s [interval-in-seconds]\n' "${script_name}"
+		exit
+		;;
+	[0-9][0-9]*)
+		interval="${1}"
+		;;
+esac
+
+while true
+do
+	/usr/bin/env bash ${shell_opts} irc-atom-notice-wiki "${interval}"
+	/usr/bin/env bash ${shell_opts} irc-atom-notice-forums "${interval}"
+	sleep "${interval}s"
+done

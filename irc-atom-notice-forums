@@ -1,0 +1,119 @@
+#! /usr/bin/env bash
+
+# © 2022 Unvanquished Developers
+# MIT License https://spdx.org/licenses/MIT.html 
+
+export shell_opts="${shell_opts:--u -e -o pipefail}"
+set ${shell_opts}
+
+export slug='forums'
+export atom_url='https://forums.unvanquished.net/app.php/feed'
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+cd "${script_dir}"
+
+script_name="$(basename "${BASH_SOURCE[0]}")"
+
+. 'irc-atom-notice.conf'
+
+case "${1:-}" in
+	'-h'|'--help')
+		printf '%s <interval-in-seconds>\n' "${script_name}"
+		exit
+		;;
+	[0-9][0-9]*)
+		interval="${1}"
+		;;
+esac
+
+export interval
+
+colorString () {
+	local color="${1}"; shift
+	local string="${1}"; shift
+	printf '\x03%s%s\x0f' "${color}" "${string}"
+}
+
+export -f colorString
+
+processEntry () {
+	local entry="${1}"
+
+	local date
+	local url
+	local nick
+	local title
+
+	printf "${entry}\n" \
+	| tr '\t' '\n' \
+	| while read date
+	do
+		read url
+		read nick
+		read title
+
+		title="$(printf '%s' "${title}" | html2text -utf8)"
+
+		# Split “Forum • Topic”
+		local forum="$(echo "${title}" | sed -e 's/ • .*$//')"
+		local topic="$(echo "${title}" | sed -e 's/^[^•]* • //')"
+
+		local tag="${slug}"
+		local channel='#unvanquished'
+
+		for dev_forum in \
+			'Project Planning' \
+			'Development Archive' \
+			'Assets & Artwork' \
+			'Concepts' \
+			'Models' \
+			'Animations' \
+			'Sounds & Effects' \
+			'Implementation' \
+			'Maps & Textures' \
+			'Findings' \
+			'Attic' \
+			'Troubleshooting'
+		do
+			if [ "${forum}" = "${dev_forum}" ]
+			then
+				channel='#unvanquished-dev'
+			fi
+		done
+		
+		local c_nick="$(colorString '10' "${nick}")"
+		local c_topic="$(colorString '03' "${topic}")"
+		local c_forum="$(colorString '03' "${forum}")"
+		local c_tag="$(colorString '13,15' "${tag}")"
+
+		local message="[${c_tag}] ${c_nick} posted “${c_topic}” on “${c_forum}”: ${url}"
+
+		# phpBB sets date in UTC but forgets the Z UTC suffix.
+		local commit_epoch="$(date --utc --date="${date}" '+%s')"
+		local current_epoch="$(date '+%s')"
+
+		local entry_age="$((${current_epoch} - ${commit_epoch}))"
+		local allowed_age="$((${interval} + 1))"
+
+		if [ "${entry_age}" -le "${allowed_age}" ]
+		then
+			./irc-msg "${channel}" "${message}"
+		fi
+	done
+}
+
+export -f processEntry
+
+mkdir -p 'cache'
+before_tsv="cache/${slug}-before.tsv"
+current_tsv="cache/${slug}-current.tsv"
+current_atom="cache/${slug}-current.atom"
+touch "${current_tsv}"
+mv "${current_tsv}" "${before_tsv}"
+curl -s "${atom_url}" > "${current_atom}"
+xsltproc --nonet --output "${current_tsv}" 'atom-tsv.xslt' "${current_atom}"
+sort "${current_tsv}" -o "${current_tsv}"
+comm -1 -3 "${before_tsv}" "${current_tsv}" \
+| tr '\n' '\0' \
+| xargs -0 -r -n1 -P1 \
+	/usr/bin/env bash ${shell_opts} -c 'processEntry "${@}"' processEntry
