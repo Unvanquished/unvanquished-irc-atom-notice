@@ -105,14 +105,22 @@ processEntry () {
 export -f processEntry
 
 mkdir -p 'cache'
+
 before_tsv="cache/${slug}-before.tsv"
 current_tsv="cache/${slug}-current.tsv"
 current_atom="cache/${slug}-current.atom"
+
 touch "${current_tsv}"
 mv "${current_tsv}" "${before_tsv}"
+
 curl -s "${atom_url}" > "${current_atom}"
+
+# The TSV file may not be produced if the Atom feed doesn't have any entry.
 xsltproc --nonet --output "${current_tsv}" 'atom-tsv.xslt' "${current_atom}"
+touch "${current_tsv}"
+
 sort "${current_tsv}" -o "${current_tsv}"
+
 comm -1 -3 "${before_tsv}" "${current_tsv}" \
 | tr '\n' '\0' \
 | xargs -0 -r -n1 -P1 \
