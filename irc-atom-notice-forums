@@ -52,7 +52,7 @@ processEntry () {
 		read nick
 		read title
 
-		title="$(printf '%s' "${title}" | html2text -utf8 -width 999 | head -n1)"
+		title="$(printf '%s' "${title}" | html2text -nobs -utf8 -width 999 | head -n1)"
 
 		# Split “Forum • Topic”
 		local forum="$(echo "${title}" | sed -e 's/ • .*$//')"
