@@ -57,7 +57,7 @@ clean:
 
 install:
 	install -T -m 440 irc-atom-notice.sudoers /etc/sudoers.d/irc-atom-notice
-	install irc-atom-notice.service /etc/systemd/system/
+	install -m 644 irc-atom-notice.service /etc/systemd/system/
 	systemctl enable irc-atom-notice.service
 
 uninstall:
