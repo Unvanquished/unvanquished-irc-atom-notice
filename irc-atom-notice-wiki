@@ -68,7 +68,18 @@ processEntry () {
 		local current_epoch="$(date '+%s')"
 
 		local entry_age="$((${current_epoch} - ${commit_epoch}))"
-		local allowed_age="$((${interval} + 1))"
+		local purgatory_time="$((${interval} / 60))"
+
+		if [ "${purgatory_time}" -lt 5 ]
+		then
+			purgatory_time=5
+			if [ "${purgatory_time}" -gt "${interval}" ]
+			then
+				purgatory_time=1
+			fi
+		fi
+
+		local allowed_age="$((${interval} + ${purgatory_time}))"
 
 		if [ "${entry_age}" -le "${allowed_age}" ]
 		then
