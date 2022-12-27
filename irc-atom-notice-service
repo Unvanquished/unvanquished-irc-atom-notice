@@ -23,9 +23,17 @@ case "${1:-}" in
 		;;
 esac
 
+spent_interval="${interval}"
+
 while true
 do
-	/usr/bin/env bash ${shell_opts} irc-atom-notice-wiki "${interval}"
-	/usr/bin/env bash ${shell_opts} irc-atom-notice-forums "${interval}"
-	sleep "${interval}s"
+	start_epoch="$(date '+%s')"
+
+	/usr/bin/env bash ${shell_opts} irc-atom-notice-wiki "${spent_interval}" &
+	/usr/bin/env bash ${shell_opts} irc-atom-notice-forums "${spent_interval}" &
+	sleep "${interval}s" &
+	wait
+
+	end_epoch="$(date '+%s')"
+	spent_interval="$((${end_epoch} - ${start_epoch}))"
 done
