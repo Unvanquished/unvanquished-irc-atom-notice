@@ -83,6 +83,10 @@ processEntry () {
 
 		if [ "${entry_age}" -le "${allowed_age}" ]
 		then
+			log_date="$(date --rfc-3339=s --utc --date="@${commit_epoch}")"
+			cat >> "${log_file}" <<-EOF
+			"${log_date}: ${MSGCMD:-./irc-msg} "${channel}" "${message}"
+			EOF
 			${MSGCMD:-./irc-msg} "${channel}" "${message}"
 		fi
 	done
@@ -95,6 +99,11 @@ mkdir -p "${cache_folder}"
 before_tsv="${cache_folder}/${slug}-before.tsv"
 current_tsv="${cache_folder}/${slug}-current.tsv"
 current_atom="${cache_folder}/${slug}-current.atom"
+
+mkdir -p "${log_folder}"
+export log_file="${log_folder}/${slug}.log"
+
+touch "${log_file}"
 
 touch "${current_tsv}"
 mv "${current_tsv}" "${before_tsv}"
