@@ -29,6 +29,8 @@ esac
 export interval
 
 colorString () {
+	set ${shell_opts}
+
 	local color="${1}"; shift
 	local string="${1}"; shift
 	printf '\x03%s%s\x0f' "${color}" "${string}"
@@ -37,6 +39,8 @@ colorString () {
 export -f colorString
 
 processEntry () {
+	set ${shell_opts}
+
 	local entry="${1}"
 
 	local date
