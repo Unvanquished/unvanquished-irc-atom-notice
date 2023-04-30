@@ -83,7 +83,7 @@ processEntry () {
 
 		if [ "${entry_age}" -le "${allowed_age}" ]
 		then
-			./irc-msg "${channel}" "${message}"
+			${MSGCMD:-./irc-msg} "${channel}" "${message}"
 		fi
 	done
 }

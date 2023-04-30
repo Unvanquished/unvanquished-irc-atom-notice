@@ -15,6 +15,8 @@ It requires the Overmind bot running [PyTIBot](https://github.com/DefaultUser/Py
 
 By default the Atom feeds are pulled every 60 seconds, the interval can be configured in `irc-atom-notice.conf` (in seconds).
 
+One can say a custom command for sending the notices with `MSGCMD` environment variable, mainly for debugging purpose.
+
 ## Installation
 
 ```sh
