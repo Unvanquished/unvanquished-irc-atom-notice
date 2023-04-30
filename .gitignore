@@ -1,4 +1,4 @@
-cache/
+/.cache/
 irc-atom-notice.service
 irc-atom-notice.sudoers
 Makefile

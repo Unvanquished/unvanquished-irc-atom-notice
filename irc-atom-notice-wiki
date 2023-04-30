@@ -90,11 +90,11 @@ processEntry () {
 
 export -f processEntry
 
-mkdir -p 'cache'
+mkdir -p "${cache_folder}"
 
-before_tsv="cache/${slug}-before.tsv"
-current_tsv="cache/${slug}-current.tsv"
-current_atom="cache/${slug}-current.atom"
+before_tsv="${cache_folder}/${slug}-before.tsv"
+current_tsv="${cache_folder}/${slug}-current.tsv"
+current_atom="${cache_folder}/${slug}-current.atom"
 
 touch "${current_tsv}"
 mv "${current_tsv}" "${before_tsv}"
