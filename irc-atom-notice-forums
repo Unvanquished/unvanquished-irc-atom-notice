@@ -67,7 +67,6 @@ processEntry () {
 
 		for dev_forum in \
 			'Project Planning' \
-			'Development Archive' \
 			'Assets & Artwork' \
 			'Concepts' \
 			'Models' \
