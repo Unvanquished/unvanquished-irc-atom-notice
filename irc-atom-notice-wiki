@@ -98,14 +98,14 @@ processEntry () {
 
 export -f processEntry
 
-mkdir -p "${cache_folder}"
+mkdir -p "${cache_dir}"
 
-before_tsv="${cache_folder}/${slug}-before.tsv"
-current_tsv="${cache_folder}/${slug}-current.tsv"
-current_atom="${cache_folder}/${slug}-current.atom"
+before_tsv="${cache_dir}/${slug}-before.tsv"
+current_tsv="${cache_dir}/${slug}-current.tsv"
+current_atom="${cache_dir}/${slug}-current.atom"
 
-mkdir -p "${log_folder}"
-export log_file="${log_folder}/${slug}.log"
+mkdir -p "${log_dir}"
+export log_file="${log_dir}/${slug}.log"
 
 touch "${log_file}"
 
