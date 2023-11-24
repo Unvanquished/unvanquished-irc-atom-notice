@@ -75,7 +75,6 @@ processEntry () {
 			'Implementation' \
 			'Maps & Textures' \
 			'Findings' \
-			'Attic' \
 			'Troubleshooting'
 		do
 			if [ "${forum}" = "${dev_forum}" ]
