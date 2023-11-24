@@ -48,7 +48,7 @@ processEntry () {
 	local nick
 	local title
 
-	printf "${entry}\n" \
+	printf '%s\n' "${entry}" \
 	| tr '\t' '\n' \
 	| while read date
 	do
