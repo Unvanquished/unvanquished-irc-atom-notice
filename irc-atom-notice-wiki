@@ -67,7 +67,7 @@ processEntry () {
 
 		local message="[${c_tag}] ${c_nick} edited “${c_title}”: ${url}"
 
-		# MediaWiki already set the Z UTC suffix.
+		# MediaWiki already sets the Z UTC suffix.
 		local commit_epoch="$(date --date="${date}" '+%s')"
 		local current_epoch="$(date '+%s')"
 
