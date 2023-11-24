@@ -12,6 +12,9 @@ cd "${script_dir}"
 . 'irc-atom-notice.conf'
 . 'credentials-forums.conf'
 
+# Not a bad thing to do
+chmod og-rwx 'credentials-forums.conf'
+
 if [ -z "${1:-}" ]
 then
 	echo 'ERROR: missing url' &>2
