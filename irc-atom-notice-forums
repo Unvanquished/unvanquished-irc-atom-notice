@@ -7,7 +7,7 @@ export shell_opts="${shell_opts:--u -e -o pipefail}"
 set ${shell_opts}
 
 export slug='forums'
-export atom_url='https://forums.unvanquished.net/app.php/feed'
+export forum_url='https://forums.unvanquished.net'
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 cd "${script_dir}"
@@ -135,7 +135,13 @@ touch "${log_file}"
 touch "${current_tsv}"
 mv "${current_tsv}" "${before_tsv}"
 
-curl -s "${atom_url}" > "${current_atom}"
+if [ -f 'credentials-forums.conf' ]
+then
+	./authenticated-atom-forums "${forum_url}" > "${current_atom}"
+else
+	atom_url="${forum_url}/app.php/feed"
+	curl -s "${atom_url}" > "${current_atom}"
+fi
 
 # The TSV file may not be produced if the Atom feed doesn't have any entry.
 xsltproc --nonet --output "${current_tsv}" 'atom-tsv.xslt' "${current_atom}"

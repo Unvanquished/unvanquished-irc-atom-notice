@@ -2,4 +2,5 @@
 /logs
 /irc-atom-notice.service
 /irc-atom-notice.sudoers
+/credentials-forums.conf
 /Makefile

@@ -1,0 +1,103 @@
+#! /usr/bin/env bash
+
+# © 2023 Unvanquished Developers
+# MIT License https://spdx.org/licenses/MIT.html
+
+export shell_opts="${shell_opts:--u -e -o pipefail}"
+set ${shell_opts}
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+cd "${script_dir}"
+
+. 'irc-atom-notice.conf'
+. 'credentials-forums.conf'
+
+if [ -z "${1:-}" ]
+then
+	echo 'ERROR: missing url' &>2
+	false
+fi
+
+forum_url="${1}"
+
+atom_url="${forum_url}/app.php/feed"
+forum_login_url="${forum_url}/ucp.php?mode=login"
+
+forum_cache_dir="${cache_dir}/forums"
+cookie_file="${forum_cache_dir}/cookies.txt"
+login_page="${forum_cache_dir}/login.html"
+sid_file="${forum_cache_dir}/sid.txt"
+token_file="${forum_cache_dir}/token.txt"
+time_file="${forum_cache_dir}/time.txt"
+output_file="${forum_cache_dir}/output.txt"
+config_file="${forum_cache_dir}/config.txt"
+
+mkdir -p "${forum_cache_dir}"
+chmod go-rwx "${forum_cache_dir}"
+
+curl --silent \
+	--output "${login_page}" \
+	--cookie-jar "${cookie_file}" \
+	"${forum_login_url}"
+
+grep 'id="login"' "${login_page}" \
+| sed -e 's/^.*sid=\([0-9a-z]*\)".*$/\1/' \
+> "${sid_file}"
+
+grep 'name="creation_time"' "${login_page}" \
+| sed -e 's/^.*value="\([0-9a-z]*\)".*$/\1/' \
+> "${time_file}"
+
+grep 'name="form_token"' "${login_page}" \
+| sed -e 's/^.*value="\([0-9a-z]*\)".*$/\1/' \
+> "${token_file}"
+
+sid_string="$(cat "${sid_file}")"
+time_string="$(cat "${time_file}")"
+token_string="$(cat "${token_file}")"
+
+# It looks like the “viewonline” option
+# is to not be listed as online…
+cat > "${config_file}" <<EOF
+--form login="Login"
+--form autologin='on'
+--form viewonline='on'
+--form username="${forums_username}"
+--form password="${forums_password}"
+--form sid="${sid_string}"
+--form creation_time="${time_string}"
+--form form_token="${token_string}"
+--form redirect="${atom_url}"
+EOF
+
+# Retry 5 times
+for i in {1..5}
+do
+	curl --silent \
+		--location \
+		--output "${output_file}" \
+		--cookie "${cookie_file}" \
+		--cookie-jar "${cookie_file}" \
+		--config "${config_file}" \
+		"${forum_login_url}&sid=${sid_string}"
+
+	output_format="$(head -n 2 "${output_file}" | tail -n 1)"
+
+	case "${output_format}" in
+		'<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en-gb">')
+			cat "${output_file}"
+			break
+			;;
+	esac
+
+	sleep 1s;
+done
+
+rm "${cookie_file}"
+rm "${login_page}"
+rm "${sid_file}"
+rm "${token_file}"
+rm "${time_file}"
+rm "${output_file}"
+rm "${config_file}"
+rmdir "${forum_cache_dir}"
