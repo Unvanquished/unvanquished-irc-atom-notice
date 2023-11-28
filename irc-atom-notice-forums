@@ -67,6 +67,7 @@ processEntry () {
 
 		if [ -f 'channels-forums.conf' ]
 		then
+			. 'channels-forums.conf'
 			for token in "${channels_forums[@]}"
 			do
 				if [ "${token:0:1}" = '#' ]
