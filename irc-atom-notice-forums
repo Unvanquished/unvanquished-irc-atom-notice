@@ -65,7 +65,7 @@ processEntry () {
 		local tag="${slug}"
 		local channel='#unvanquished'
 
-		if [ -f 'channelss-forums.conf' ]
+		if [ -f 'channels-forums.conf' ]
 		then
 			for token in "${channels_forums[@]}"
 			do
