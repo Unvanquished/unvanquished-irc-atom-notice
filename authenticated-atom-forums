@@ -59,12 +59,10 @@ sid_string="$(cat "${sid_file}")"
 time_string="$(cat "${time_file}")"
 token_string="$(cat "${token_file}")"
 
-# It looks like the “viewonline” option
-# is to not be listed as online…
 cat > "${config_file}" <<EOF
 --form login="Login"
 --form autologin='on'
---form viewonline='on'
+--form viewonline='off'
 --form username="${forums_username}"
 --form password="${forums_password}"
 --form sid="${sid_string}"
