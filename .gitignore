@@ -3,4 +3,5 @@
 /irc-atom-notice.service
 /irc-atom-notice.sudoers
 /credentials-forums.conf
+/channels-forums.conf
 /Makefile

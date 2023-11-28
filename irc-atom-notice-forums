@@ -65,23 +65,23 @@ processEntry () {
 		local tag="${slug}"
 		local channel='#unvanquished'
 
-		for dev_forum in \
-			'Project Planning' \
-			'Assets & Artwork' \
-			'Concepts' \
-			'Models' \
-			'Animations' \
-			'Sounds & Effects' \
-			'Implementation' \
-			'Maps & Textures' \
-			'Findings' \
-			'Troubleshooting'
-		do
-			if [ "${forum}" = "${dev_forum}" ]
-			then
-				channel='#unvanquished-dev'
-			fi
-		done
+		if [ -f 'channelss-forums.conf' ]
+		then
+			for token in "${channels_forums[@]}"
+			do
+				if [ "${token:0:1}" = '#' ]
+				then
+					channel="${token}"
+					continue
+				else
+					channel_forum="${token}"
+					if [ "${forum}" = "${channel_forum}" ]
+					then
+						break;
+					fi
+				fi
+			done
+		fi
 		
 		local c_nick="$(colorString '10' "${nick}")"
 		local c_topic="$(colorString '03' "${topic}")"

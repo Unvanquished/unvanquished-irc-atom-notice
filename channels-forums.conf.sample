@@ -1,0 +1,15 @@
+# The last channel without forums is the default one.
+channels_forums=(
+	'#unvanquished-dev'
+		'Project Planning'
+		'Assets & Artwork'
+		'Concepts'
+		'Models'
+		'Animations'
+		'Sounds & Effects'
+		'Implementation'
+		'Maps & Textures'
+		'Findings'
+		'Troubleshooting'
+	'#unvanquished'
+)
