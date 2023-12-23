@@ -115,7 +115,8 @@ mv "${current_tsv}" "${before_tsv}"
 curl -s "${atom_url}" > "${current_atom}"
 
 # The TSV file may not be produced if the Atom feed doesn't have any entry.
-xsltproc --nonet --output "${current_tsv}" 'atom-tsv.xslt' "${current_atom}"
+# The MediaWiki Atom feed doesn't have a published date field, only an updated date one. We track Wiki editions anyway.
+xsltproc --nonet --output "${current_tsv}" 'atom-tsv-updated.xslt' "${current_atom}"
 touch "${current_tsv}"
 
 sort "${current_tsv}" -o "${current_tsv}"
