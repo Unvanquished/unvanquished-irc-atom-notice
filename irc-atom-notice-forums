@@ -89,7 +89,7 @@ processEntry () {
 		local c_forum="$(colorString '03' "${forum}")"
 		local c_tag="$(colorString '13,15' "${tag}")"
 
-		local message="[${c_tag}] ${c_nick} posted “${c_topic}” on “${c_forum}”: <${url}>"
+		local message="[${c_tag}] ${c_nick} posted “${c_topic}” on “${c_forum}”: &lt;${url}&gt;"
 
 		# phpBB sets date in UTC but forgets the Z UTC suffix.
 		local commit_epoch="$(date --utc --date="${date}" '+%s')"
